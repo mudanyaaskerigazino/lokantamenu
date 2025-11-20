@@ -2,455 +2,430 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restoran Menüsü</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mudanya Jandarma Sosyal Tesisleri</title>
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Konfigürasyonu -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#004aad',   /* Jandarma Mavisi */
+                            gold: '#d4af37',   /* Altın Sarısı */
+                            dark: '#1e293b',
+                            light: '#f8fafc'
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
-    /* Renk Paleti ve Genel Ayarlar */
-    :root {
-        --primary-color: #007bff; 
-        --secondary-color: #28a745; 
-        --accent-color: #ffc107; 
-        --text-dark: #212529; 
-        --text-light: #6c757d; 
-        --bg-color: #f8f9fa; 
-        --card-bg: #ffffff;
-        --border-radius: 12px;
-        --shadow: 0 4px 15px rgba(0,0,0,0.08);
-        --hover-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
-        font-family: 'Poppins', sans-serif; 
-        background-color: var(--bg-color); 
-        color: var(--text-dark); 
-        line-height: 1.6;
-        -webkit-font-smoothing: antialiased;
-        scroll-behavior: smooth;
-    }
-
-    h1, h2, h3 {
-        font-family: 'Playfair Display', serif;
-        color: var(--text-dark);
-        margin-bottom: 0.5em;
-    }
-    h1 { font-size: 2.5rem; }
-    h2 { font-size: 2rem; }
-    h3 { font-size: 1.5rem; }
-
-    /* Header */
-    header {
-        background: var(--card-bg);
-        padding: 20px;
-        text-align: center;
-        box-shadow: var(--shadow);
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-    }
-    .header-logos {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 20px; 
-        margin-bottom: 10px;
-        flex-wrap: wrap; 
-    }
-    .header-logos img {
-        height: 70px; 
-        object-fit: contain;
-        max-width: 100%;
-    }
-    header h1 { 
-        font-size: 2.5rem; 
-        color: var(--primary-color); 
-        margin-bottom: 5px; 
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-    }
-    header h1 i { font-size: 2.8rem; color: var(--accent-color); }
-    header p { 
-        font-size: 1.1rem; 
-        color: var(--text-light); 
-        max-width: 700px;
-        margin: 0 auto;
-    }
-
-    /* Kategori Filtreleri */
-    .filters {
-        display: flex;
-        flex-wrap: nowrap; 
-        gap: 12px;
-        overflow-x: auto; 
-        padding: 20px;
-        -webkit-overflow-scrolling: touch; 
-        justify-content: center;
-        background-color: #fff;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        border-bottom: 1px solid #eee;
-        position: sticky;
-        top: 110px; 
-        z-index: 900;
-    }
-    .filter-btn {
-        flex-shrink: 0; 
-        border: none;
-        background: var(--bg-color);
-        padding: 10px 25px;
-        border-radius: 25px;
-        font-size: 1rem;
-        font-weight: 600;
-        color: var(--text-dark);
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        transition: all 0.3s ease;
-        white-space: nowrap; 
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .filter-btn:hover {
-        background: var(--secondary-color);
-        color: #fff;
-        transform: translateY(-2px);
-        box-shadow: var(--hover-shadow);
-    }
-    .filter-btn.active {
-        background: var(--primary-color);
-        color: #fff;
-        box-shadow: var(--hover-shadow);
-        transform: translateY(-1px);
-    }
-
-    /* Menü Izgarası */
-    .menu-container {
-        max-width: 1300px;
-        margin: 30px auto;
-        padding: 0 20px;
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
-        gap: 30px;
-    }
-
-    /* Ürün Kartı */
-    .menu-item {
-        background: var(--card-bg);
-        border-radius: var(--border-radius);
-        overflow: hidden;
-        box-shadow: var(--shadow);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-    }
-    .menu-item:hover { 
-        transform: translateY(-8px); 
-        box-shadow: var(--hover-shadow); 
-    }
-    
-    .item-img-wrapper {
-        width: 100%;
-        min-height: 180px; /* Minimum yükseklik belirle */
-        max-height: 300px; /* Maksimum yükseklik belirle */
-        overflow: hidden;
-        background-color: #f0f0f0;
-        border-bottom: 1px solid #eee;
-        display: flex; /* Resmi dikey ortalamak için */
-        justify-content: center;
-        align-items: center;
-    }
-    .item-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover; /* Geliştirme: Kutuya sığacak şekilde, gerekli yerleri kırparak doldurur */
-        object-position: center; /* Geliştirme: Resmin ortasını gösterir */
-        transition: transform 0.3s ease;
-    }
-    .menu-item:hover .item-img {
-        transform: scale(1.05); 
-    }
-    
-    .item-content { 
-        padding: 20px; 
-        flex-grow: 1; 
-        display: flex; 
-        flex-direction: column; 
-        justify-content: space-between;
-    }
-    
-    .item-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center; 
-        margin-bottom: 12px;
-        gap: 15px; 
-    }
-    .item-title { 
-        font-size: 1.3rem; 
-        font-weight: 700; 
-        color: var(--text-dark);
-        line-height: 1.3;
-    }
-    .item-price { 
-        background: var(--primary-color); 
-        color: #fff; 
-        padding: 8px 15px; 
-        border-radius: 8px; 
-        font-weight: 700;
-        font-size: 1.1rem;
-        flex-shrink: 0; 
-    }
-    .item-desc { 
-        font-size: 0.95rem; 
-        color: var(--text-light); 
-        line-height: 1.6; 
-        margin-bottom: 15px; 
-    }
-
-    /* Yükleniyor Animasyonu */
-    #loader { 
-        text-align: center; 
-        padding: 80px; 
-        font-size: 1.4rem; 
-        color: var(--text-light); 
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-    }
-    #loader i { font-size: 2.5rem; color: var(--accent-color); }
-    
-    /* Footer */
-    footer { 
-        background-color: var(--text-dark); 
-        color: #ecf0f1; 
-        text-align: center; 
-        padding: 40px 20px; 
-        font-size: 0.9rem; 
-        margin-top: 50px;
-    }
-    footer a { 
-        color: var(--secondary-color); 
-        text-decoration: none; 
-        transition: color 0.3s ease; 
-    }
-    footer a:hover { color: var(--accent-color); }
-    footer .social-icons { margin-top: 20px; }
-    footer .social-icons a { 
-        font-size: 1.8rem; 
-        margin: 0 15px; 
-        color: #ecf0f1;
-    }
-    footer .social-icons a:hover { color: var(--accent-color); }
-
-
-    /* Responsive Düzenlemeler */
-    @media (max-width: 768px) {
-        header { padding: 15px; }
-        .header-logos { gap: 10px; }
-        .header-logos img { height: 60px; }
-        header h1 { font-size: 1.8rem; gap: 10px; }
-        header h1 i { font-size: 2rem; }
-        header p { font-size: 1rem; }
-        .filters { 
-            justify-content: flex-start; 
-            padding-left: 15px; 
-            padding-right: 15px;
-            top: 100px; 
+        /* Özel Kaydırma Çubuğu Gizleme (Yatay Menü İçin) */
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
         }
-        .filter-btn { padding: 8px 20px; font-size: 0.9rem; }
-        .menu-container {
-            grid-template-columns: 1fr; 
-            padding: 0 15px;
-            margin-top: 20px;
+        .hide-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
-        .item-title { font-size: 1.2rem; }
-        .item-price { font-size: 1rem; padding: 6px 12px; }
-        .item-img-wrapper { min-height: 150px; max-height: 250px; } /* Mobil için yükseklik aralığı */
-    }
+        
+        /* Animasyonlar */
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    @media (max-width: 480px) {
-        header { padding: 10px; }
-        .header-logos img { height: 50px; }
-        header h1 { font-size: 1.5rem; gap: 8px; }
-        header h1 i { font-size: 1.8rem; }
-        header p { font-size: 0.9rem; }
-        .filters { top: 90px; }
-        .filter-btn { padding: 7px 18px; font-size: 0.85rem; }
-        .item-img-wrapper { min-height: 120px; max-height: 200px; } /* Küçük mobil için yükseklik aralığı */
-    }
-</style>
+        /* Görsel Kırpma */
+        .aspect-card {
+            aspect-ratio: 4/3;
+        }
+        @media (min-width: 768px) {
+            .aspect-card {
+                aspect-ratio: 1/1;
+            }
+        }
+    </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 antialiased pb-24 selection:bg-brand-blue selection:text-white">
 
-<header>
-    <div class="header-logos">
-        <img src="./jandarma-logo.png" alt="Jandarma Genel Komutanlığı Logo">
-        
-        <img src="./mudanya-tesis-logo.png" alt="Jandarma Sosyal Tesisleri Mudanya Logo">
-    </div>
-    <h1><i class="fas fa-utensils"></i> Mudanya Jandarma Sosyal Tesisleri</h1>
-</header>
-
-<div class="filters" id="categoryFilters">
-    <button class="filter-btn active" onclick="filterMenu('all')"><i class="fas fa-grip-horizontal"></i> Tümü</button>
-</div>
-
-<div id="loader">
-    <i class="fas fa-spinner fa-spin"></i>
-    <p>Menü Yükleniyor...</p>
-</div>
-<div class="menu-container" id="menuContainer"></div>
-
-<footer>
-<p>© 2025 Mudanya Jandarma Sosyal Tesisleri <br> Afiyet Olsun.</p>
-</footer>
-<script>
-    // --- AYARLAR ---
-    // Buraya Google Sheet'ten aldığın CSV linkini yapıştır:
-    // Not: Linkin sonunun /pub?output=csv ile bittiğinden emin ol.
-    const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnvb7qJ8T3rqZyigU8VAajzG5o4r05gvNygffBk2hDe5_u05uXPTTTZDPq09zwchNuLZjBMTRvej3m/pub?output=csv"; 
-
-    let allData = [];
-
-    // Google Drive Linkini Dönüştürme Fonksiyonu
-    function convertDriveLink(link) {
-        if (!link) return 'https://via.placeholder.com/300x200?text=Resim+Yok'; 
-        try {
-            // Link içindeki ID'yi yakalar
-            // Hem "file/d/ID/" hem de "id=ID" formatlarını destekler
-            let id = "";
-            const match1 = link.match(/\/d\/(.+?)\//);
-            const match2 = link.match(/id=(.+?)(&|$)/);
+    <!-- ÜST HEADER (Sabit) -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all duration-300" id="mainHeader">
+        <div class="max-w-3xl mx-auto px-4 pt-3 pb-1">
             
-            if (match1) id = match1[1];
-            else if (match2) id = match2[1];
-
-            if(id) return `https://lh3.googleusercontent.com/d/${id}=s800`; // Daha hızlı bir Google görsel sunucusu
-            return link;
-        } catch (e) {
-            return link;
-        }
-    }
-
-    // Verileri Çekme ve İşleme (GÜNCELLENMİŞ KISIM)
-    function init() {
-        fetch(GOOGLE_SHEET_CSV_URL)
-            .then(response => {
-                if (!response.ok) throw new Error("Ağ hatası oluştu");
-                return response.text();
-            })
-            .then(csvText => {
-                // Gelen CSV metnini JSON'a çevir
-                Papa.parse(csvText, {
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: function(results) {
-                        allData = results.data;
-                        renderCategories();
-                        renderMenu(allData);
-                        document.getElementById('loader').style.display = 'none';
-                    }
-                });
-            })
-            .catch(error => {
-                document.getElementById('loader').innerHTML = 
-                    '<div style="color:red">Veri çekilemedi.<br>Lütfen Google Sheet\'in "Web\'de Yayınla" ayarını kontrol et.<br><small>Hata: ' + error + '</small></div>';
-                console.error('Hata:', error);
-            });
-    }
-
-    // Kategorileri Oluştur
-    function renderCategories() {
-        const categories = ['all'];
-        allData.forEach(item => {
-            // Kategori boşluklarını temizle (trim)
-            const cleanCat = item.Kategori ? item.Kategori.trim() : "";
-            if(cleanCat && !categories.includes(cleanCat)) {
-                categories.push(cleanCat);
-            }
-        });
-
-        const filterContainer = document.getElementById('categoryFilters');
-        filterContainer.innerHTML = '<button class="filter-btn active" onclick="filterMenu(\'all\')">Tümü</button>';
-        
-        categories.forEach(cat => {
-            if (cat === 'all') return;
-            const btn = document.createElement('button');
-            btn.className = 'filter-btn';
-            btn.innerText = cat;
-            btn.onclick = () => filterMenu(cat);
-            filterContainer.appendChild(btn);
-        });
-    }
-
-    // Menüyü Ekrana Bas
-    function renderMenu(data) {
-        const container = document.getElementById('menuContainer');
-        container.innerHTML = '';
-
-        if(data.length === 0) {
-            container.innerHTML = '<p style="text-align:center; width:100%;">Bu kategoride ürün bulunamadı.</p>';
-            return;
-        }
-
-        data.forEach(item => {
-            if (!item.UrunAdi) return; 
-
-            const imgUrl = convertDriveLink(item.ResimLink);
-            
-            const card = document.createElement('div');
-            card.className = 'menu-item';
-            card.innerHTML = `
-                <img src="${imgUrl}" alt="${item.UrunAdi}" class="item-img" loading="lazy">
-                <div class="item-content">
-                    <div class="item-header">
-                        <div class="item-title">${item.UrunAdi}</div>
-                        <div class="item-price">${item.Fiyat} ₺</div> 
+            <!-- Logolar ve Başlık -->
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <!-- Logo Alanı -->
+                    <div class="relative w-12 h-12 flex items-center justify-center">
+                        <img src="mudanya-tesis-logo.png" onerror="this.src='https://via.placeholder.com/100?text=Tesis'" alt="Tesis Logo" class="w-full h-full object-contain drop-shadow-sm">
                     </div>
-                    <div class="item-desc">${item.Aciklama || ''}</div>
+                    <div class="h-8 w-px bg-slate-300 mx-1"></div>
+                    <div class="relative w-10 h-10 flex items-center justify-center opacity-90">
+                        <img src="jandarma-logo.png" onerror="this.src='https://via.placeholder.com/100?text=Jandarma'" alt="Jandarma Logo" class="w-full h-full object-contain">
+                    </div>
+                    
+                    <div class="ml-1 flex flex-col justify-center">
+                        <h1 class="text-sm font-bold text-brand-blue leading-tight tracking-wide uppercase">SOSYAL TESİSLER</h1>
+                        <span class="text-[10px] text-slate-500 font-semibold tracking-widest uppercase">MUDANYA</span>
+                    </div>
                 </div>
-            `;
-            container.appendChild(card);
-        });
-    }
 
-    // Filtreleme Fonksiyonu
-    window.filterMenu = function(category) {
-        const buttons = document.querySelectorAll('.filter-btn');
-        buttons.forEach(btn => {
-            if(btn.innerText === category || (category === 'all' && btn.innerText === 'Tümü')) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
+                <!-- Admin Toggle (Gizli Özellik) -->
+                <div>
+                    <label class="flex items-center cursor-pointer select-none group">
+                        <div class="relative">
+                            <input type="checkbox" id="passiveToggle" class="sr-only">
+                            <div class="block bg-slate-200 w-8 h-5 rounded-full transition group-hover:bg-slate-300"></div>
+                            <div class="dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition transform duration-300 ease-in-out"></div>
+                        </div>
+                        <div class="ml-2 text-[9px] font-bold text-slate-400 uppercase tracking-wider">Düzenle</div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- KATEGORİ NAVİGASYONU (Yatay Scroll) -->
+            <div class="relative -mx-4 px-4">
+                <nav id="categoryNav" class="flex gap-2 overflow-x-auto hide-scroll pb-3 snap-x">
+                    <!-- JS ile doldurulacak -->
+                    <!-- Skeleton Loader (Kategoriler Yüklenirken) -->
+                    <div class="h-9 w-20 bg-slate-200 rounded-full animate-pulse flex-shrink-0"></div>
+                    <div class="h-9 w-24 bg-slate-200 rounded-full animate-pulse flex-shrink-0"></div>
+                    <div class="h-9 w-16 bg-slate-200 rounded-full animate-pulse flex-shrink-0"></div>
+                    <div class="h-9 w-20 bg-slate-200 rounded-full animate-pulse flex-shrink-0"></div>
+                </nav>
+                <!-- Gölge Efekti (Sağda içerik olduğunu göstermek için) -->
+                <div class="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white/90 to-transparent pointer-events-none"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ANA İÇERİK -->
+    <main class="max-w-3xl mx-auto px-4 pt-6">
+        
+        <!-- Hata Mesajı Alanı -->
+        <div id="errorArea" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm text-center"></div>
+
+        <!-- Yükleniyor (Skeleton Cards) -->
+        <div id="loader" class="space-y-4">
+            <!-- Skeleton Item 1 -->
+            <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 flex gap-3 animate-pulse">
+                <div class="w-24 h-24 bg-slate-200 rounded-xl flex-shrink-0"></div>
+                <div class="flex-1 py-1 space-y-2">
+                    <div class="h-4 bg-slate-200 rounded w-3/4"></div>
+                    <div class="h-3 bg-slate-200 rounded w-full"></div>
+                    <div class="h-3 bg-slate-200 rounded w-1/2"></div>
+                </div>
+            </div>
+            <!-- Skeleton Item 2 -->
+            <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 flex gap-3 animate-pulse">
+                <div class="w-24 h-24 bg-slate-200 rounded-xl flex-shrink-0"></div>
+                <div class="flex-1 py-1 space-y-2">
+                    <div class="h-4 bg-slate-200 rounded w-3/4"></div>
+                    <div class="h-3 bg-slate-200 rounded w-full"></div>
+                    <div class="h-3 bg-slate-200 rounded w-1/2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÜRÜN LİSTESİ -->
+        <div id="menuContainer" class="space-y-8 min-h-[50vh]">
+            <!-- JS burayı dolduracak -->
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-12 py-8 text-center border-t border-slate-200 bg-white">
+        <div class="flex justify-center gap-4 mb-4 opacity-50">
+             <i class="fas fa-utensils text-slate-400"></i>
+             <i class="fas fa-coffee text-slate-400"></i>
+        </div>
+        <p class="text-slate-500 text-xs font-medium uppercase tracking-widest">Mudanya Jandarma Sosyal Tesisleri</p>
+        <p class="text-slate-400 text-[10px] mt-1">Afiyet Olsun.</p>
+    </footer>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // --- KONFIGURASYON (Google Sheets Linkleri) ---
+        const CATEGORIES_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnvb7qJ8T3rqZyigU8VAajzG5o4r05gvNygffBk2hDe5_u05uXPTTTZDPq09zwchNuLZjBMTRvej3m/pub?gid=1692246047&single=true&output=csv';
+        const PRODUCTS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnvb7qJ8T3rqZyigU8VAajzG5o4r05gvNygffBk2hDe5_u05uXPTTTZDPq09zwchNuLZjBMTRvej3m/pub?gid=0&single=true&output=csv';
+
+        // Veri Depoları
+        let allCategories = [];
+        let allProducts = [];
+        let activeCategoryID = 'all';
+
+        // --- BAŞLATMA ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            
+            // Toggle Dinleyicisi
+            const toggle = document.getElementById('passiveToggle');
+            toggle.addEventListener('change', () => {
+                // Toggle animasyonu (CSS class manipulation for dot)
+                const dot = toggle.nextElementSibling.nextElementSibling;
+                if(toggle.checked) {
+                    dot.classList.add('translate-x-3', 'bg-brand-blue');
+                    dot.classList.remove('bg-white');
+                } else {
+                    dot.classList.remove('translate-x-3', 'bg-brand-blue');
+                    dot.classList.add('bg-white');
+                }
+                renderMenu(activeCategoryID);
+            });
+        });
+
+        // --- ANA FONKSİYON ---
+        async function initApp() {
+            try {
+                // Paralel veri çekme
+                const [catRes, prodRes] = await Promise.all([
+                    fetch(CATEGORIES_URL),
+                    fetch(PRODUCTS_URL)
+                ]);
+
+                if (!catRes.ok || !prodRes.ok) throw new Error('Sunucuya erişilemedi.');
+
+                const catText = await catRes.text();
+                const prodText = await prodRes.text();
+
+                // CSV İşleme
+                const categoriesRaw = parseCSV(catText);
+                const productsRaw = parseCSV(prodText);
+
+                // Veri Sıralama (Safe Parsing ile hata önleme)
+                allCategories = categoriesRaw
+                    .filter(c => c['KategoriID'] && c['KategoriAdi']) // Boş satırları ele
+                    .sort((a, b) => (parseInt(a['Sira']) || 999) - (parseInt(b['Sira']) || 999));
+                
+                allProducts = productsRaw
+                    .filter(p => p['UrunAdi']) // Adı olmayan ürünü ele
+                    .sort((a, b) => (parseInt(a['UrunSirasi']) || 999) - (parseInt(b['UrunSirasi']) || 999));
+
+                // Arayüzü Oluştur
+                renderCategories();
+                renderMenu('all');
+
+                // Yükleme ekranını kapat
+                document.getElementById('loader').style.display = 'none';
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loader').style.display = 'none';
+                const errDiv = document.getElementById('errorArea');
+                errDiv.classList.remove('hidden');
+                errDiv.innerHTML = `
+                    <strong>Veri Yükleme Hatası!</strong><br>
+                    Bağlantınızı kontrol edin. Hata detayı: ${error.message}
+                    <br><span class="text-xs mt-2 block">Not: Dosyayı bilgisayardan doğrudan açtıysanız çalışmaz. Bir sunucu gerekir.</span>
+                `;
             }
-        });
-
-        if (category === 'all') {
-            renderMenu(allData);
-        } else {
-            // Boşluk hassasiyetini kaldırarak filtrele
-            const filtered = allData.filter(item => item.Kategori && item.Kategori.trim() === category);
-            renderMenu(filtered);
         }
-    }
 
-    // Başlat
-    init();
-</script>
+        // --- CSV PARSER (Virgül ve Tırnaklara Dayanıklı) ---
+        function parseCSV(str) {
+            const arr = [];
+            let quote = false; 
+            let col, c;
+            for (let row = col = c = 0; c < str.length; c++) {
+                var cc = str[c], nc = str[c+1];
+                arr[row] = arr[row] || [];
+                arr[row][col] = arr[row][col] || '';
+                if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
+                if (cc == '"') { quote = !quote; continue; }
+                if (cc == ',' && !quote) { ++col; continue; }
+                if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
+                if (cc == '\n' && !quote) { ++row; col = 0; continue; }
+                if (cc == '\r' && !quote) { ++row; col = 0; continue; }
+                arr[row][col] += cc;
+            }
+            const headers = arr[0].map(h => h.trim()); // İlk satır başlık
+            return arr.slice(1).map(row => {
+                let obj = {};
+                row.forEach((val, i) => { if(headers[i]) obj[headers[i].trim()] = val.trim(); });
+                return obj;
+            });
+        }
 
+        // --- KATEGORİ NAVİGASYONU ---
+        function renderCategories() {
+            const nav = document.getElementById('categoryNav');
+            nav.innerHTML = '';
+
+            // "Tümü" Butonu
+            const allBtn = createNavButton('all', 'Tümü', true);
+            nav.appendChild(allBtn);
+
+            allCategories.forEach(cat => {
+                const btn = createNavButton(cat['KategoriID'], cat['KategoriAdi'], false);
+                nav.appendChild(btn);
+            });
+        }
+
+        function createNavButton(id, name, isActive) {
+            const btn = document.createElement('button');
+            btn.dataset.id = id; // Seçim için ID ata
+            
+            // Temel Sınıflar
+            let classes = "snap-start flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 border border-transparent shadow-sm whitespace-nowrap ";
+            
+            // Aktif/Pasif Durumu
+            if (activeCategoryID === id) {
+                classes += "bg-brand-blue text-white shadow-brand-blue/30 scale-105";
+            } else {
+                classes += "bg-white text-slate-500 border-slate-100 hover:border-brand-blue hover:text-brand-blue";
+            }
+            
+            btn.className = classes;
+            btn.textContent = name;
+            
+            btn.onclick = () => {
+                activeCategoryID = id;
+                updateNavStyles();
+                renderMenu(id);
+                
+                // Tıklanan butonu ortala (UX)
+                btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            };
+            
+            return btn;
+        }
+
+        function updateNavStyles() {
+            const btns = document.querySelectorAll('#categoryNav button');
+            btns.forEach(btn => {
+                const isSelected = btn.dataset.id === activeCategoryID;
+                if (isSelected) {
+                    btn.className = "snap-start flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 border border-transparent shadow-sm whitespace-nowrap bg-brand-blue text-white shadow-brand-blue/30 scale-105";
+                } else {
+                    btn.className = "snap-start flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 border border-transparent shadow-sm whitespace-nowrap bg-white text-slate-500 border-slate-100 hover:border-brand-blue hover:text-brand-blue";
+                }
+            });
+        }
+
+        // --- MENÜ LİSTELEME ---
+        function renderMenu(filterCatID) {
+            const container = document.getElementById('menuContainer');
+            container.innerHTML = ''; 
+            
+            const showPassive = document.getElementById('passiveToggle').checked;
+
+            // Kategorilere göre döngü (Sıralı başlıklar için)
+            allCategories.forEach(cat => {
+                // Filtreleme Kontrolü
+                if (filterCatID !== 'all' && cat['KategoriID'] !== filterCatID) return;
+
+                // Ürünleri bul ve filtrele
+                const categoryProducts = allProducts.filter(p => p['KategoriID'] === cat['KategoriID']);
+                
+                const visibleProducts = categoryProducts.filter(p => {
+                    const isActive = p['AktifDurum'] && p['AktifDurum'].toUpperCase() === 'EVET';
+                    return showPassive ? true : isActive;
+                });
+
+                if (visibleProducts.length === 0) return;
+
+                // --- Kategori Bloğu ---
+                const section = document.createElement('div');
+                section.className = "mb-8 fade-in-up";
+
+                // Başlık (Sadece 'Tümü' seçiliyken gösterilir, yoksa zaten üstte seçili)
+                if (filterCatID === 'all') {
+                    const header = document.createElement('div');
+                    header.className = "flex items-center gap-2 mb-4 px-1";
+                    header.innerHTML = `
+                        <div class="w-1 h-4 bg-brand-gold rounded-full"></div>
+                        <h2 class="text-lg font-bold text-brand-dark">${cat['KategoriAdi']}</h2>
+                    `;
+                    section.appendChild(header);
+                }
+
+                // Grid
+                const grid = document.createElement('div');
+                grid.className = "grid grid-cols-1 md:grid-cols-2 gap-4";
+
+                visibleProducts.forEach(prod => {
+                    // Kart Oluşturma
+                    const isPassive = prod['AktifDurum'] && prod['AktifDurum'].toUpperCase() !== 'EVET';
+                    const hasImage = prod['ResimLinki'] && prod['ResimLinki'].length > 5;
+                    const imgUrl = hasImage ? prod['ResimLinki'] : 'https://via.placeholder.com/150?text=Resim+Yok';
+
+                    const card = document.createElement('div');
+                    card.className = `
+                        group bg-white rounded-2xl p-3 border border-slate-100 shadow-soft hover:shadow-md transition-all duration-300 flex gap-4 overflow-hidden relative
+                        ${isPassive ? 'opacity-60 grayscale border-dashed border-red-300 bg-slate-50' : ''}
+                    `;
+
+                    card.innerHTML = `
+                        <!-- Görsel Alanı -->
+                        <div class="w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden bg-slate-100 relative shadow-inner">
+                            <img src="${imgUrl}" alt="${prod['UrunAdi']}" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                            ${isPassive ? '<div class="absolute inset-0 bg-black/50 flex items-center justify-center text-white text-[10px] font-bold uppercase">Pasif</div>' : ''}
+                        </div>
+
+                        <!-- İçerik Alanı -->
+                        <div class="flex flex-col justify-center flex-1 min-w-0 py-1">
+                            <h3 class="text-slate-800 font-bold text-base leading-tight mb-1.5 truncate pr-4">${prod['UrunAdi']}</h3>
+                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2 mb-2">${prod['Aciklama'] || 'Açıklama bulunmuyor.'}</p>
+                            
+                            <!-- Fiyat (Opsiyonel - Eğer CSV'de fiyat sütunu eklersen buraya koyabilirsin) -->
+                            <!-- <div class="text-brand-blue font-bold text-sm mt-auto">₺150</div> -->
+                        </div>
+
+                        <!-- Sağ Ok İkonu (Dekoratif) -->
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-200 group-hover:text-brand-gold transition-colors duration-300">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+                section.appendChild(grid);
+                container.appendChild(section);
+            });
+
+            // Boş Durum Kontrolü
+            if (container.innerHTML === '') {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-16 text-center">
+                        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-300">
+                            <i class="fas fa-search text-2xl"></i>
+                        </div>
+                        <h3 class="text-slate-600 font-bold">Ürün Bulunamadı</h3>
+                        <p class="text-slate-400 text-xs mt-1">Bu kategoride henüz aktif ürün yok.</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
 </body>
-
 </html>
-
-
