@@ -39,39 +39,22 @@
     </script>
 
     <style>
-        /* Özel Kaydırma Çubuğu Gizleme (Yatay Menü İçin) */
-        .hide-scroll::-webkit-scrollbar {
-            display: none;
-        }
-        .hide-scroll {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        /* Özel Kaydırma Çubuğu Gizleme */
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
         
         /* Animasyonlar */
-        .fade-in-up {
-            animation: fadeInUp 0.5s ease-out forwards;
-        }
-        
+        .fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Görsel Kırpma */
-        .aspect-card {
-            aspect-ratio: 4/3;
-        }
-        @media (min-width: 768px) {
-            .aspect-card {
-                aspect-ratio: 1/1;
-            }
+        /* Modal Animasyonu */
+        .modal-enter { animation: modalIn 0.3s ease-out forwards; }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
     </style>
 </head>
@@ -82,9 +65,8 @@
         <div class="max-w-3xl mx-auto px-4 pt-3 pb-1">
             
             <!-- Logolar ve Başlık -->
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center justify-center mb-4 relative">
                 <div class="flex items-center gap-3">
-                    <!-- Logo Alanı -->
                     <div class="relative w-12 h-12 flex items-center justify-center">
                         <img src="mudanya-tesis-logo.png" onerror="this.src='https://via.placeholder.com/100?text=Tesis'" alt="Tesis Logo" class="w-full h-full object-contain drop-shadow-sm">
                     </div>
@@ -94,35 +76,19 @@
                     </div>
                     
                     <div class="ml-1 flex flex-col justify-center">
-                        <h1 class="text-sm font-bold text-brand-blue leading-tight tracking-wide uppercase">SOSYAL TESİSLER</h1>
+                        <h1 class="text-sm font-bold text-brand-blue leading-tight tracking-wide uppercase">JANDARMA SOSYAL TESİSLERİ</h1>
                         <span class="text-[10px] text-slate-500 font-semibold tracking-widest uppercase">MUDANYA</span>
                     </div>
                 </div>
-
-                <!-- Admin Toggle (Gizli Özellik) -->
-                <div>
-                    <label class="flex items-center cursor-pointer select-none group">
-                        <div class="relative">
-                            <input type="checkbox" id="passiveToggle" class="sr-only">
-                            <div class="block bg-slate-200 w-8 h-5 rounded-full transition group-hover:bg-slate-300"></div>
-                            <div class="dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition transform duration-300 ease-in-out"></div>
-                        </div>
-                        <div class="ml-2 text-[9px] font-bold text-slate-400 uppercase tracking-wider">Düzenle</div>
-                    </label>
-                </div>
             </div>
 
-            <!-- KATEGORİ NAVİGASYONU (Yatay Scroll) -->
+            <!-- KATEGORİ NAVİGASYONU -->
             <div class="relative -mx-4 px-4">
                 <nav id="categoryNav" class="flex gap-2 overflow-x-auto hide-scroll pb-3 snap-x">
                     <!-- JS ile doldurulacak -->
-                    <!-- Skeleton Loader (Kategoriler Yüklenirken) -->
                     <div class="h-9 w-20 bg-slate-200 rounded-full animate-pulse flex-shrink-0"></div>
                     <div class="h-9 w-24 bg-slate-200 rounded-full animate-pulse flex-shrink-0"></div>
-                    <div class="h-9 w-16 bg-slate-200 rounded-full animate-pulse flex-shrink-0"></div>
-                    <div class="h-9 w-20 bg-slate-200 rounded-full animate-pulse flex-shrink-0"></div>
                 </nav>
-                <!-- Gölge Efekti (Sağda içerik olduğunu göstermek için) -->
                 <div class="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white/90 to-transparent pointer-events-none"></div>
             </div>
         </div>
@@ -131,35 +97,21 @@
     <!-- ANA İÇERİK -->
     <main class="max-w-3xl mx-auto px-4 pt-6">
         
-        <!-- Hata Mesajı Alanı -->
         <div id="errorArea" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm text-center"></div>
 
-        <!-- Yükleniyor (Skeleton Cards) -->
+        <!-- Yükleniyor (Skeleton) -->
         <div id="loader" class="space-y-4">
-            <!-- Skeleton Item 1 -->
             <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 flex gap-3 animate-pulse">
                 <div class="w-24 h-24 bg-slate-200 rounded-xl flex-shrink-0"></div>
                 <div class="flex-1 py-1 space-y-2">
                     <div class="h-4 bg-slate-200 rounded w-3/4"></div>
                     <div class="h-3 bg-slate-200 rounded w-full"></div>
-                    <div class="h-3 bg-slate-200 rounded w-1/2"></div>
-                </div>
-            </div>
-            <!-- Skeleton Item 2 -->
-            <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 flex gap-3 animate-pulse">
-                <div class="w-24 h-24 bg-slate-200 rounded-xl flex-shrink-0"></div>
-                <div class="flex-1 py-1 space-y-2">
-                    <div class="h-4 bg-slate-200 rounded w-3/4"></div>
-                    <div class="h-3 bg-slate-200 rounded w-full"></div>
-                    <div class="h-3 bg-slate-200 rounded w-1/2"></div>
                 </div>
             </div>
         </div>
 
         <!-- ÜRÜN LİSTESİ -->
-        <div id="menuContainer" class="space-y-8 min-h-[50vh]">
-            <!-- JS burayı dolduracak -->
-        </div>
+        <div id="menuContainer" class="space-y-8 min-h-[50vh]"></div>
 
     </main>
 
@@ -170,44 +122,70 @@
              <i class="fas fa-coffee text-slate-400"></i>
         </div>
         <p class="text-slate-500 text-xs font-medium uppercase tracking-widest">Mudanya Jandarma Sosyal Tesisleri</p>
-        <p class="text-slate-400 text-[10px] mt-1">Afiyet Olsun.</p>
+        <p class="text-slate-400 text-[10px] mt-1">Afiyet Olsun</p>
     </footer>
+
+    <!-- MODAL (POPUP) -->
+    <div id="productModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!-- Arka Plan Karartma -->
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
+
+        <!-- Modal İçeriği -->
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                
+                <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg modal-enter w-full">
+                    
+                    <!-- Kapat Butonu -->
+                    <button type="button" class="absolute top-3 right-3 z-10 bg-white/80 rounded-full p-2 text-slate-400 hover:text-slate-600 hover:bg-white transition-colors" onclick="closeModal()">
+                        <i class="fas fa-times text-xl w-6 h-6 flex items-center justify-center"></i>
+                    </button>
+
+                    <!-- Modal Resim -->
+                    <div class="w-full h-64 bg-slate-100 relative">
+                         <img id="modalImage" src="" alt="Ürün Detay" class="w-full h-full object-cover" referrerpolicy="no-referrer">
+                    </div>
+
+                    <!-- Modal Metin -->
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-slate-900 leading-6 pr-4" id="modalTitle">Ürün Adı</h3>
+                            <div class="text-lg font-bold text-brand-blue whitespace-nowrap" id="modalPrice">₺0</div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <p class="text-sm text-slate-600 leading-relaxed" id="modalDesc">
+                                Ürün açıklaması burada yer alacak.
+                            </p>
+                        </div>
+                        
+                        <div class="mt-6 pt-4 border-t border-slate-100 flex justify-center">
+                            <button type="button" class="inline-flex w-full justify-center rounded-xl bg-brand-blue px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 sm:w-auto" onclick="closeModal()">
+                                Kapat
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- JAVASCRIPT -->
     <script>
-        // --- KONFIGURASYON (Google Sheets Linkleri) ---
+        // --- KONFIGURASYON ---
         const CATEGORIES_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnvb7qJ8T3rqZyigU8VAajzG5o4r05gvNygffBk2hDe5_u05uXPTTTZDPq09zwchNuLZjBMTRvej3m/pub?gid=1692246047&single=true&output=csv';
         const PRODUCTS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnvb7qJ8T3rqZyigU8VAajzG5o4r05gvNygffBk2hDe5_u05uXPTTTZDPq09zwchNuLZjBMTRvej3m/pub?gid=0&single=true&output=csv';
 
-        // Veri Depoları
         let allCategories = [];
         let allProducts = [];
         let activeCategoryID = 'all';
 
-        // --- BAŞLATMA ---
         document.addEventListener('DOMContentLoaded', () => {
             initApp();
-            
-            // Toggle Dinleyicisi
-            const toggle = document.getElementById('passiveToggle');
-            toggle.addEventListener('change', () => {
-                // Toggle animasyonu (CSS class manipulation for dot)
-                const dot = toggle.nextElementSibling.nextElementSibling;
-                if(toggle.checked) {
-                    dot.classList.add('translate-x-3', 'bg-brand-blue');
-                    dot.classList.remove('bg-white');
-                } else {
-                    dot.classList.remove('translate-x-3', 'bg-brand-blue');
-                    dot.classList.add('bg-white');
-                }
-                renderMenu(activeCategoryID);
-            });
         });
 
-        // --- ANA FONKSİYON ---
         async function initApp() {
             try {
-                // Paralel veri çekme
                 const [catRes, prodRes] = await Promise.all([
                     fetch(CATEGORIES_URL),
                     fetch(PRODUCTS_URL)
@@ -218,24 +196,19 @@
                 const catText = await catRes.text();
                 const prodText = await prodRes.text();
 
-                // CSV İşleme
                 const categoriesRaw = parseCSV(catText);
                 const productsRaw = parseCSV(prodText);
 
-                // Veri Sıralama (Safe Parsing ile hata önleme)
                 allCategories = categoriesRaw
-                    .filter(c => c['KategoriID'] && c['KategoriAdi']) // Boş satırları ele
+                    .filter(c => c['KategoriID'] && c['KategoriAdi'])
                     .sort((a, b) => (parseInt(a['Sira']) || 999) - (parseInt(b['Sira']) || 999));
                 
                 allProducts = productsRaw
-                    .filter(p => p['UrunAdi']) // Adı olmayan ürünü ele
+                    .filter(p => p['UrunAdi'])
                     .sort((a, b) => (parseInt(a['UrunSirasi']) || 999) - (parseInt(b['UrunSirasi']) || 999));
 
-                // Arayüzü Oluştur
                 renderCategories();
                 renderMenu('all');
-
-                // Yükleme ekranını kapat
                 document.getElementById('loader').style.display = 'none';
 
             } catch (error) {
@@ -243,15 +216,10 @@
                 document.getElementById('loader').style.display = 'none';
                 const errDiv = document.getElementById('errorArea');
                 errDiv.classList.remove('hidden');
-                errDiv.innerHTML = `
-                    <strong>Veri Yükleme Hatası!</strong><br>
-                    Bağlantınızı kontrol edin. Hata detayı: ${error.message}
-                    <br><span class="text-xs mt-2 block">Not: Dosyayı bilgisayardan doğrudan açtıysanız çalışmaz. Bir sunucu gerekir.</span>
-                `;
+                errDiv.innerHTML = `<strong>Hata:</strong> ${error.message}`;
             }
         }
 
-        // --- CSV PARSER (Virgül ve Tırnaklara Dayanıklı) ---
         function parseCSV(str) {
             const arr = [];
             let quote = false; 
@@ -268,7 +236,7 @@
                 if (cc == '\r' && !quote) { ++row; col = 0; continue; }
                 arr[row][col] += cc;
             }
-            const headers = arr[0].map(h => h.trim()); // İlk satır başlık
+            const headers = arr[0].map(h => h.trim()); 
             return arr.slice(1).map(row => {
                 let obj = {};
                 row.forEach((val, i) => { if(headers[i]) obj[headers[i].trim()] = val.trim(); });
@@ -276,12 +244,39 @@
             });
         }
 
-        // --- KATEGORİ NAVİGASYONU ---
+        // --- GOOGLE DRIVE RESİM DÖNÜŞTÜRÜCÜ (THUMBNAIL API) ---
+        function convertGoogleDriveLink(link) {
+            if (!link) return '';
+            // Eğer link zaten doğrudan bir resim linkiyse (jpg, png vb bitiyorsa) elleme
+            if (link.match(/\.(jpeg|jpg|gif|png|webp)$/i) != null) return link;
+
+            // Google Drive linki mi kontrol et
+            if (link.includes('drive.google.com') || link.includes('docs.google.com')) {
+                // Dosya ID'sini yakala (/d/ ile / arasındaki her şey veya id= parametresi)
+                let id = '';
+                const idMatch = link.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                const idParamMatch = link.match(/id=([a-zA-Z0-9_-]+)/);
+
+                if (idMatch && idMatch[1]) {
+                    id = idMatch[1];
+                } else if (idParamMatch && idParamMatch[1]) {
+                    id = idParamMatch[1];
+                }
+
+                if (id) {
+                    // Thumbnail API kullan (sz=w1000 boyutu ayarlar)
+                    // Bu yöntem hotlink korumasını aşmada en başarılısıdır
+                    return `https://drive.google.com/thumbnail?id=${id}&sz=w1000`;
+                }
+            }
+            return link;
+        }
+
+        // --- KATEGORİ İŞLEMLERİ ---
         function renderCategories() {
             const nav = document.getElementById('categoryNav');
             nav.innerHTML = '';
 
-            // "Tümü" Butonu
             const allBtn = createNavButton('all', 'Tümü', true);
             nav.appendChild(allBtn);
 
@@ -293,18 +288,14 @@
 
         function createNavButton(id, name, isActive) {
             const btn = document.createElement('button');
-            btn.dataset.id = id; // Seçim için ID ata
+            btn.dataset.id = id;
             
-            // Temel Sınıflar
             let classes = "snap-start flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 border border-transparent shadow-sm whitespace-nowrap ";
-            
-            // Aktif/Pasif Durumu
             if (activeCategoryID === id) {
                 classes += "bg-brand-blue text-white shadow-brand-blue/30 scale-105";
             } else {
                 classes += "bg-white text-slate-500 border-slate-100 hover:border-brand-blue hover:text-brand-blue";
             }
-            
             btn.className = classes;
             btn.textContent = name;
             
@@ -312,11 +303,8 @@
                 activeCategoryID = id;
                 updateNavStyles();
                 renderMenu(id);
-                
-                // Tıklanan butonu ortala (UX)
                 btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             };
-            
             return btn;
         }
 
@@ -337,28 +325,20 @@
             const container = document.getElementById('menuContainer');
             container.innerHTML = ''; 
             
-            const showPassive = document.getElementById('passiveToggle').checked;
-
-            // Kategorilere göre döngü (Sıralı başlıklar için)
             allCategories.forEach(cat => {
-                // Filtreleme Kontrolü
                 if (filterCatID !== 'all' && cat['KategoriID'] !== filterCatID) return;
 
-                // Ürünleri bul ve filtrele
                 const categoryProducts = allProducts.filter(p => p['KategoriID'] === cat['KategoriID']);
-                
                 const visibleProducts = categoryProducts.filter(p => {
-                    const isActive = p['AktifDurum'] && p['AktifDurum'].toUpperCase() === 'EVET';
-                    return showPassive ? true : isActive;
+                    if (!p['AktifDurum']) return false;
+                    return p['AktifDurum'].toString().trim().toUpperCase() === 'FALSE';
                 });
 
                 if (visibleProducts.length === 0) return;
 
-                // --- Kategori Bloğu ---
                 const section = document.createElement('div');
                 section.className = "mb-8 fade-in-up";
 
-                // Başlık (Sadece 'Tümü' seçiliyken gösterilir, yoksa zaten üstte seçili)
                 if (filterCatID === 'all') {
                     const header = document.createElement('div');
                     header.className = "flex items-center gap-2 mb-4 px-1";
@@ -369,39 +349,38 @@
                     section.appendChild(header);
                 }
 
-                // Grid
                 const grid = document.createElement('div');
                 grid.className = "grid grid-cols-1 md:grid-cols-2 gap-4";
 
                 visibleProducts.forEach(prod => {
-                    // Kart Oluşturma
-                    const isPassive = prod['AktifDurum'] && prod['AktifDurum'].toUpperCase() !== 'EVET';
-                    const hasImage = prod['ResimLinki'] && prod['ResimLinki'].length > 5;
-                    const imgUrl = hasImage ? prod['ResimLinki'] : 'https://via.placeholder.com/150?text=Resim+Yok';
+                    let rawImgUrl = prod['ResimLinki'];
+                    let imgUrl = (rawImgUrl && rawImgUrl.length > 5) 
+                        ? convertGoogleDriveLink(rawImgUrl) 
+                        : 'https://via.placeholder.com/150?text=Resim+Yok';
 
+                    const price = prod['UrunFiyati'] ? `${prod['UrunFiyati']} ₺` : '';
+                    const hasDesc = prod['Aciklama'] && prod['Aciklama'].trim().length > 0;
+                    
                     const card = document.createElement('div');
-                    card.className = `
-                        group bg-white rounded-2xl p-3 border border-slate-100 shadow-soft hover:shadow-md transition-all duration-300 flex gap-4 overflow-hidden relative
-                        ${isPassive ? 'opacity-60 grayscale border-dashed border-red-300 bg-slate-50' : ''}
-                    `;
+                    card.className = "group bg-white rounded-2xl p-3 border border-slate-100 shadow-soft hover:shadow-md transition-all duration-300 flex gap-4 overflow-hidden relative cursor-pointer";
+                    
+                    card.onclick = () => openModal({
+                        title: prod['UrunAdi'],
+                        desc: prod['Aciklama'],
+                        price: price,
+                        img: imgUrl
+                    });
 
                     card.innerHTML = `
-                        <!-- Görsel Alanı -->
                         <div class="w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden bg-slate-100 relative shadow-inner">
-                            <img src="${imgUrl}" alt="${prod['UrunAdi']}" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" loading="lazy">
-                            ${isPassive ? '<div class="absolute inset-0 bg-black/50 flex items-center justify-center text-white text-[10px] font-bold uppercase">Pasif</div>' : ''}
+                            <img src="${imgUrl}" alt="${prod['UrunAdi']}" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" loading="lazy" referrerpolicy="no-referrer">
                         </div>
-
-                        <!-- İçerik Alanı -->
                         <div class="flex flex-col justify-center flex-1 min-w-0 py-1">
-                            <h3 class="text-slate-800 font-bold text-base leading-tight mb-1.5 truncate pr-4">${prod['UrunAdi']}</h3>
-                            <p class="text-slate-500 text-xs leading-relaxed line-clamp-2 mb-2">${prod['Aciklama'] || 'Açıklama bulunmuyor.'}</p>
-                            
-                            <!-- Fiyat (Opsiyonel - Eğer CSV'de fiyat sütunu eklersen buraya koyabilirsin) -->
-                            <!-- <div class="text-brand-blue font-bold text-sm mt-auto">₺150</div> -->
+                            <h3 class="text-slate-800 font-bold text-base leading-tight mb-1 truncate pr-4">${prod['UrunAdi']}</h3>
+                            ${price ? `<div class="text-brand-blue font-bold text-sm mb-1">${price}</div>` : ''}
+                            ${hasDesc ? `<p class="text-slate-500 text-xs leading-relaxed line-clamp-2">${prod['Aciklama']}</p>` : ''}
+                            ${hasDesc ? '<div class="text-[10px] text-slate-400 mt-1 font-medium">Detay için dokun</div>' : ''}
                         </div>
-
-                        <!-- Sağ Ok İkonu (Dekoratif) -->
                         <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-200 group-hover:text-brand-gold transition-colors duration-300">
                             <i class="fas fa-chevron-right text-xs"></i>
                         </div>
@@ -413,7 +392,6 @@
                 container.appendChild(section);
             });
 
-            // Boş Durum Kontrolü
             if (container.innerHTML === '') {
                 container.innerHTML = `
                     <div class="flex flex-col items-center justify-center py-16 text-center">
@@ -425,6 +403,30 @@
                     </div>
                 `;
             }
+        }
+
+        // --- MODAL İŞLEMLERİ ---
+        const modal = document.getElementById('productModal');
+        
+        function openModal(product) {
+            document.getElementById('modalTitle').textContent = product.title;
+            document.getElementById('modalDesc').textContent = product.desc || 'Bu ürün için açıklama bulunmuyor.';
+            document.getElementById('modalPrice').textContent = product.price;
+            
+            const modalImg = document.getElementById('modalImage');
+            modalImg.src = product.img;
+            modalImg.onerror = function() {
+                // Eğer yüklenemezse fallback placeholder
+                this.src = 'https://via.placeholder.com/500?text=Resim+Yuklenemedi';
+            };
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
         }
     </script>
 </body>
