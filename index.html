@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restoran Menüsü</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #ff6b6b; /* Ana renk */
+            --text-dark: #2d3436;
+            --text-light: #636e72;
+            --bg-color: #f9f9f9;
+            --card-bg: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-dark); }
+
+        /* Header */
+        header {
+            background: #fff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        header h1 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px; }
+        header p { font-size: 0.9rem; color: var(--text-light); }
+
+        /* Kategori Filtreleri */
+        .filters {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 15px 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            justify-content: center;
+        }
+        .filter-btn {
+            border: none;
+            background: #fff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--primary-color);
+            color: #fff;
+        }
+
+        /* Menü Izgarası */
+        .menu-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Mobil uyumlu grid */
+            gap: 25px;
+        }
+
+        /* Ürün Kartı */
+        .menu-item {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .menu-item:hover { transform: translateY(-5px); }
+        
+        .item-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background-color: #eee;
+        }
+        
+        .item-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .item-title { font-size: 1.1rem; font-weight: 600; }
+        .item-price { 
+            background: var(--primary-color); 
+            color: #fff; 
+            padding: 5px 10px; 
+            border-radius: 10px; 
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .item-desc { font-size: 0.85rem; color: var(--text-light); line-height: 1.5; margin-bottom: 10px; }
+        
+        /* Footer */
+        footer { text-align: center; padding: 30px; color: var(--text-light); font-size: 0.8rem; }
+
+        /* Yükleniyor Animasyonu */
+        #loader { text-align: center; padding: 50px; font-size: 1.2rem; color: var(--text-light); }
+        
+        /* Mobilde filtrelerin sola yaslanması için */
+        @media (max-width: 600px) {
+            .filters { justify-content: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1><i class="fas fa-utensils"></i> Gusto Restoran</h1>
+    <p>Lezzetin adresi - Hoş geldiniz</p>
+</header>
+
+<div class="filters" id="categoryFilters">
+    <button class="filter-btn active" onclick="filterMenu('all')">Tümü</button>
+    </div>
+
+<div id="loader"><i class="fas fa-spinner fa-spin"></i> Menü Yükleniyor...</div>
+<div class="menu-container" id="menuContainer"></div>
+
+<footer>
+    <p>&copy; 2025 Gusto Restoran. Afiyet Olsun.</p>
+    <div style="margin-top:10px;">
+        <a href="#" style="color: inherit; margin: 0 10px;"><i class="fab fa-instagram"></i></a>
+        <a href="#" style="color: inherit; margin: 0 10px;"><i class="fab fa-whatsapp"></i></a>
+    </div>
+</footer>
+
+<script>
+    // --- AYARLAR ---
+    // Buraya Google Sheet'ten aldığın CSV linkini yapıştır:
+    // Not: Linkin sonunun /pub?output=csv ile bittiğinden emin ol.
+    const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnvb7qJ8T3rqZyigU8VAajzG5o4r05gvNygffBk2hDe5_u05uXPTTTZDPq09zwchNuLZjBMTRvej3m/pub?output=csv"; 
+
+    let allData = [];
+
+    // Google Drive Linkini Dönüştürme Fonksiyonu
+    function convertDriveLink(link) {
+        if (!link) return 'https://via.placeholder.com/300x200?text=Resim+Yok'; 
+        try {
+            // Link içindeki ID'yi yakalar
+            // Hem "file/d/ID/" hem de "id=ID" formatlarını destekler
+            let id = "";
+            const match1 = link.match(/\/d\/(.+?)\//);
+            const match2 = link.match(/id=(.+?)(&|$)/);
+            
+            if (match1) id = match1[1];
+            else if (match2) id = match2[1];
+
+            if(id) return `https://lh3.googleusercontent.com/d/${id}=s800`; // Daha hızlı bir Google görsel sunucusu
+            return link;
+        } catch (e) {
+            return link;
+        }
+    }
+
+    // Verileri Çekme ve İşleme (GÜNCELLENMİŞ KISIM)
+    function init() {
+        fetch(GOOGLE_SHEET_CSV_URL)
+            .then(response => {
+                if (!response.ok) throw new Error("Ağ hatası oluştu");
+                return response.text();
+            })
+            .then(csvText => {
+                // Gelen CSV metnini JSON'a çevir
+                Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        allData = results.data;
+                        renderCategories();
+                        renderMenu(allData);
+                        document.getElementById('loader').style.display = 'none';
+                    }
+                });
+            })
+            .catch(error => {
+                document.getElementById('loader').innerHTML = 
+                    '<div style="color:red">Veri çekilemedi.<br>Lütfen Google Sheet\'in "Web\'de Yayınla" ayarını kontrol et.<br><small>Hata: ' + error + '</small></div>';
+                console.error('Hata:', error);
+            });
+    }
+
+    // Kategorileri Oluştur
+    function renderCategories() {
+        const categories = ['all'];
+        allData.forEach(item => {
+            // Kategori boşluklarını temizle (trim)
+            const cleanCat = item.Kategori ? item.Kategori.trim() : "";
+            if(cleanCat && !categories.includes(cleanCat)) {
+                categories.push(cleanCat);
+            }
+        });
+
+        const filterContainer = document.getElementById('categoryFilters');
+        filterContainer.innerHTML = '<button class="filter-btn active" onclick="filterMenu(\'all\')">Tümü</button>';
+        
+        categories.forEach(cat => {
+            if (cat === 'all') return;
+            const btn = document.createElement('button');
+            btn.className = 'filter-btn';
+            btn.innerText = cat;
+            btn.onclick = () => filterMenu(cat);
+            filterContainer.appendChild(btn);
+        });
+    }
+
+    // Menüyü Ekrana Bas
+    function renderMenu(data) {
+        const container = document.getElementById('menuContainer');
+        container.innerHTML = '';
+
+        if(data.length === 0) {
+            container.innerHTML = '<p style="text-align:center; width:100%;">Bu kategoride ürün bulunamadı.</p>';
+            return;
+        }
+
+        data.forEach(item => {
+            if (!item.UrunAdi) return; 
+
+            const imgUrl = convertDriveLink(item.ResimLink);
+            
+            const card = document.createElement('div');
+            card.className = 'menu-item';
+            card.innerHTML = `
+                <img src="${imgUrl}" alt="${item.UrunAdi}" class="item-img" loading="lazy">
+                <div class="item-content">
+                    <div class="item-header">
+                        <div class="item-title">${item.UrunAdi}</div>
+                        <div class="item-price">${item.Fiyat} ₺</div> 
+                    </div>
+                    <div class="item-desc">${item.Aciklama || ''}</div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // Filtreleme Fonksiyonu
+    window.filterMenu = function(category) {
+        const buttons = document.querySelectorAll('.filter-btn');
+        buttons.forEach(btn => {
+            if(btn.innerText === category || (category === 'all' && btn.innerText === 'Tümü')) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        if (category === 'all') {
+            renderMenu(allData);
+        } else {
+            // Boşluk hassasiyetini kaldırarak filtrele
+            const filtered = allData.filter(item => item.Kategori && item.Kategori.trim() === category);
+            renderMenu(filtered);
+        }
+    }
+
+    // Başlat
+    init();
+</script>
+
+</body>
+</html>
